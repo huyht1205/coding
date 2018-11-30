@@ -6,16 +6,45 @@ vector<string> split_string(string);
 
 // Complete the arrayManipulation function below.
 long arrayManipulation(int n, vector<vector<int>> queries) {
+    long arr[n];
+    long max = 0;
 
-    return 0;
+    memset(arr, 0, sizeof(arr));
+
+    for (size_t r = 0; r < queries.size(); r++)
+    {
+        int a = queries.at(r).at(0);
+        int b = queries.at(r).at(1);
+        int k = queries.at(r).at(2);
+
+        for (int i = (a-1); i < b; i++)
+        {
+            arr[i] += k;
+            if (max < arr[i])
+            {
+                max = arr[i];
+            }
+        }
+    }
+
+    return max;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+    if (nullptr == argv[1])
+    {
+        cout << "Usage: array-manipulation <input file>" << endl;
+        return -1;
+    }
+
+    string inputFile(argv[1]);
+
+    ifstream fin(inputFile);
     ofstream fout(getenv("OUTPUT_PATH"));
 
     string nm_temp;
-    getline(cin, nm_temp);
+    getline(fin, nm_temp);
 
     vector<string> nm = split_string(nm_temp);
 
@@ -28,14 +57,15 @@ int main()
         queries[i].resize(3);
 
         for (int j = 0; j < 3; j++) {
-            cin >> queries[i][j];
+            fin >> queries[i][j];
         }
 
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        fin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
 
     long result = arrayManipulation(n, queries);
 
+    cout << result << endl;
     fout << result << "\n";
 
     fout.close();

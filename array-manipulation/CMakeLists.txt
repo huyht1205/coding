@@ -25,6 +25,7 @@ include_directories(
     )
 
 add_compile_options(
+    -g
     )
 
 add_definitions(
