@@ -1,5 +1,5 @@
 add_compile_options(
-    -std=c++11
+    -std=c99
     -Wall
     -Wextra
     -Werror

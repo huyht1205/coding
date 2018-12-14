@@ -6,13 +6,13 @@ set(TARGET
 
 project(${TARGET}
     VERSION 1.0.0
-    LANGUAGES "CXX"
+    LANGUAGES "C"
     )
 
 include(CMakeBase.inc)
 
 set(SOURCES
-    ${TARGET}.cpp
+    ${TARGET}.c
     )
 
 set(DEPENDENCIES_LIST
