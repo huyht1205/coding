@@ -11,15 +11,13 @@ int main(void) {
     char buf[12];
     int error = 0;
 
-    wifiErr = HAL_WIFI_Client_init();
-    RETURN_WEMSG_IF(wifiErr, wifiErr, "Could not init WiFi\n");
 
     memset(&addr, 0, sizeof(addr));
     addr.sin_family      = AF_INET;
     addr.sin_port        = htons(SERVER_PORT);
     addr.sin_addr.s_addr = inet_addr(SERVER_ADDR);
-    wifiErr = HAL_WIFI_Client_connect(&addr);
-    RETURN_WEMSG_IF(wifiErr, wifiErr, "Could not connect to server\n");
+    wifiErr = HAL_WIFI_Client_init(&addr);
+    RETURN_WEMSG_IF(wifiErr, wifiErr, "Could not init WiFi client\n");
 
     for (int i = 0; i < 10; ++i) {
         snprintf(buf, sizeof(buf), "Count %02d\n", i);

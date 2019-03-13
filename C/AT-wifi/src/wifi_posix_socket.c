@@ -5,12 +5,14 @@
 #include "hal_wifi.h"
 #include "macros.h"
 
-static int privSock;
+static int privSock = 0;
 static int privPeer[MAX_CLIENT_NUM];
 
 HAL_WifiStatus
 HAL_WIFI_Server_init(const HAL_wifi_addr_t *const addr)
 {
+    RETURN_WEMSG_IF(privSock != 0, WIFI_BUSY, "A server instance was created");
+
     int ret = 0;
 
     memset(privPeer, 0, sizeof(privPeer));
@@ -25,17 +27,17 @@ HAL_WIFI_Server_init(const HAL_wifi_addr_t *const addr)
 }
 
 HAL_WifiStatus
-HAL_WIFI_Server_accept(HAL_wifi_addr_t *const clientAddr,
-                       const uint32_t         clientNum)
+HAL_WIFI_Server_accept(const uint32_t clientNum)
 {
     int ret = 0;
+    HAL_wifi_addr_t addr;
     uint32_t sockSz = sizeof(HAL_wifi_addr_t);
 
-        ret = listen(privSock, clientNum);
-        RETURN_WEMSG_IF((-1) == ret, WIFI_ERROR, "listen: %s\n", strerror(errno));
+    ret = listen(privSock, clientNum);
+    RETURN_WEMSG_IF((-1) == ret, WIFI_ERROR, "listen: %s\n", strerror(errno));
     
     for (size_t i = 0; i < clientNum; ++i) {
-        privPeer[i] = accept(privSock, (struct sockaddr *) clientAddr, &sockSz);
+        privPeer[i] = accept(privSock, (struct sockaddr *) &addr, &sockSz);
         RETURN_WEMSG_IF((-1) == privPeer[i], WIFI_ERROR, "accept: %s\n", strerror(errno));
     }
 
@@ -43,10 +45,15 @@ HAL_WIFI_Server_accept(HAL_wifi_addr_t *const clientAddr,
 }
 
 HAL_WifiStatus
-HAL_WIFI_Client_init(void)
+HAL_WIFI_Client_init(const HAL_wifi_addr_t *const serverAddr)
 {
+    int ret = 0;
+
     privSock = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
     RETURN_WEMSG_IF((-1) == privSock, WIFI_ERROR, "socket: %s\n", strerror(errno));
+
+    ret = connect(privSock, (struct sockaddr *) serverAddr, sizeof(HAL_wifi_addr_t));
+    RETURN_WEMSG_IF((-1) == ret, WIFI_ERROR, "connect: %s\n", strerror(errno));
 
     return WIFI_OK;
 }
@@ -54,10 +61,7 @@ HAL_WIFI_Client_init(void)
 HAL_WifiStatus
 HAL_WIFI_Client_connect(const HAL_wifi_addr_t *const serverAddr)
 {
-    int ret = 0;
 
-    ret = connect(privSock, (struct sockaddr *) serverAddr, sizeof(HAL_wifi_addr_t));
-    RETURN_WEMSG_IF((-1) == ret, WIFI_ERROR, "connect: %s\n", strerror(errno));
 
     return WIFI_OK;
 }

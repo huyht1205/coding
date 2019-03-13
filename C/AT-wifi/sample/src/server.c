@@ -36,9 +36,8 @@ int main(void) {
 void *listen_connection(void *arg)
 {
     int ret = 0;
-    HAL_wifi_addr_t comingAddr;
 
-    ret = HAL_WIFI_Server_accept(&comingAddr, MAX_CLIENT_NUM);
+    ret = HAL_WIFI_Server_accept(MAX_CLIENT_NUM);
     if (WIFI_OK != ret) {
         LOG("Server: Failed to accept\n");
     }
